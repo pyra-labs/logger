@@ -1,0 +1,21 @@
+{
+  "name": "Logger",
+  "version": "1.0.0",
+  "description": "Logger class for outputting logs and emailing any errors to admins",
+  "main": "index.js",
+  "type": "module",
+  "repository": "https://github.com/quartz-labs/logger.git",
+  "author": "iarla-crewe <iarla@quartzpay.io>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.3",
+    "@types/nodemailer": "^6.4.17",
+    "@types/winston": "^2.4.4",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "nodemailer": "^6.10.0",
+    "winston": "^3.17.0",
+    "zod": "^3.24.1"
+  }
+}
