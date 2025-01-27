@@ -1,12 +1,21 @@
 {
-  "name": "Logger",
+  "name": "@quartz-labs/logger",
   "version": "1.0.0",
   "description": "Logger class for outputting logs and emailing any errors to admins",
   "main": "index.js",
   "type": "module",
   "repository": "https://github.com/quartz-labs/logger.git",
-  "author": "iarla-crewe <iarla@quartzpay.io>",
+  "author": "Quartz Labs",
   "license": "MIT",
+  "bugs": {
+    "email": "iarla@quartzpay.io"
+  },
+  "homepage": "https://quartzpay.io",
+  "scripts": {
+    "lint": "yarn biome lint --write",
+    "build": "yarn install && yarn lint && tsc -p tsconfig.json",
+    "deploy": "yarn build && yarn publish --access public"
+  },
   "devDependencies": {
     "@types/dotenv": "^8.2.3",
     "@types/nodemailer": "^6.4.17",
@@ -14,6 +23,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@biomejs/biome": "^1.9.4",
     "nodemailer": "^6.10.0",
     "winston": "^3.17.0",
     "zod": "^3.24.1"
