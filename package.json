@@ -1,8 +1,20 @@
 {
   "name": "@quartz-labs/logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Logger class for outputting logs and emailing any errors to admins",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "*": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "type": "module",
   "repository": "https://github.com/quartz-labs/logger.git",
   "author": "Quartz Labs",
