@@ -3,21 +3,39 @@ import winston, { createLogger, type Logger, transports } from "winston";
 import nodemailer from "nodemailer";
 import config from "./config.js";
 import type { ErrorCacheEntry } from "./types/ErrorCacheEntry.interface.js";
+import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
 export interface AppLoggerOptions {
     name: string;
-    dailyErrorCacheTimeMs: number;
+    dailyErrorCacheTimeMs?: number;
 }
 
 export class AppLogger {
     protected logger: Logger;
     private dailyErrorCache = new Map<string, ErrorCacheEntry>();
-    // TODO: Clear cache once a day
     private dailyErrorCacheTimeMs: number;
 
     constructor(options: AppLoggerOptions) {
-        if (options.dailyErrorCacheTimeMs < 0) this.dailyErrorCacheTimeMs = 0;
-        else this.dailyErrorCacheTimeMs = options.dailyErrorCacheTimeMs;
+        if (options.dailyErrorCacheTimeMs === undefined || options.dailyErrorCacheTimeMs < 0) {
+            this.dailyErrorCacheTimeMs = 0;
+        } else {
+            this.dailyErrorCacheTimeMs = options.dailyErrorCacheTimeMs;
+        }
+
+        // Clear cache once a day
+        setInterval(() => {
+            this.dailyErrorCache.clear();
+        }, 1000 * 60 * 60 * 24);
+
+        const mailTransporter = nodemailer.createTransport({
+            host: config.EMAIL_HOST,
+            port: config.EMAIL_PORT,
+            secure: false,
+            auth: {
+                user: config.EMAIL_USER,
+                pass: config.EMAIL_PASSWORD,
+            },
+        });
 
         const consoleFormat = winston.format.combine(
             winston.format.colorize(),
@@ -31,16 +49,6 @@ export class AppLogger {
             winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
             winston.format.json({ space: 2})
         )
-
-        const mailTransporter = nodemailer.createTransport({
-            host: config.EMAIL_HOST,
-            port: config.EMAIL_PORT,
-            secure: false,
-            auth: {
-                user: config.EMAIL_USER,
-                pass: config.EMAIL_PASSWORD,
-            },
-        });
 
         const dailyErrorCacheTimeMinutes = Math.round(this.dailyErrorCacheTimeMs / 1000 / 60);
         const mailTransportInstance = new winston.transports.Stream({
@@ -107,5 +115,30 @@ export class AppLogger {
         process.on("unhandledRejection", (reason) => {
             this.logger.error(reason);
         });
+    }
+
+    protected async sendWarningEmail(subject: string, message: string): Promise<void> {
+        try {
+            const mailTransporter = nodemailer.createTransport({
+                host: config.EMAIL_HOST,
+                port: config.EMAIL_PORT,
+                secure: false,
+                auth: {
+                    user: config.EMAIL_USER,
+                    pass: config.EMAIL_PASSWORD,
+                },
+            });
+
+            await Promise.all(config.EMAIL_TO.map(admin => 
+                mailTransporter.sendMail({
+                    from: config.EMAIL_FROM,
+                    to: admin,
+                    subject: `${subject}`,
+                    text: message,
+                })
+            ));
+        } catch (error) {
+            this.logger.error(`Failed to send warning email: ${error}`);
+        }
     }
 }
