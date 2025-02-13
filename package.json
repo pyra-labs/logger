@@ -1,6 +1,6 @@
 {
   "name": "@quartz-labs/logger",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Logger class for outputting logs and emailing any errors to admins",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
