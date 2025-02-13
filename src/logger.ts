@@ -11,16 +11,21 @@ export interface AppLoggerOptions {
 }
 
 export class AppLogger {
+    private name: string;
+
     protected logger: Logger;
+
     private dailyErrorCache = new Map<string, ErrorCacheEntry>();
     private dailyErrorCacheTimeMs: number;
 
     constructor(options: AppLoggerOptions) {
+        this.name = options.name;
+
         if (options.dailyErrorCacheTimeMs === undefined || options.dailyErrorCacheTimeMs < 0) {
             this.dailyErrorCacheTimeMs = 0;
         } else {
             this.dailyErrorCacheTimeMs = options.dailyErrorCacheTimeMs;
-        }
+        }    
 
         // Clear cache once a day
         setInterval(() => {
@@ -64,8 +69,8 @@ export class AppLogger {
                     // Only send email if error has not been sent in the last errorEmailCacheTime seconds
                     if (now - cacheEntry.lastSent > this.dailyErrorCacheTimeMs) {
                         const emailSubject = this.dailyErrorCacheTimeMs > 0
-                            ? `${options.name} Error (${cacheEntry.count} occurrences in past ${dailyErrorCacheTimeMinutes} minutes)`
-                            : `${options.name} Error`;
+                            ? `${this.name} Error (${cacheEntry.count} occurrences in past ${dailyErrorCacheTimeMinutes} minutes)`
+                            : `${this.name} Error`;
 
                         for (const admin of config.EMAIL_TO) {
                             mailTransporter.sendMail({
@@ -117,7 +122,7 @@ export class AppLogger {
         });
     }
 
-    protected async sendWarningEmail(subject: string, message: string): Promise<void> {
+    protected async sendEmail(subject: string, message: string): Promise<void> {
         try {
             const mailTransporter = nodemailer.createTransport({
                 host: config.EMAIL_HOST,
@@ -133,7 +138,7 @@ export class AppLogger {
                 mailTransporter.sendMail({
                     from: config.EMAIL_FROM,
                     to: admin,
-                    subject: `${subject}`,
+                    subject: `${this.name} | ${subject}`,
                     text: message,
                 })
             ));
