@@ -5,6 +5,12 @@ import config from "./config.js";
 import type { ErrorCacheEntry } from "./types/ErrorCacheEntry.interface.js";
 import type SMTPTransport from "nodemailer/lib/smtp-transport/index.js";
 
+/**
+ * Options for the AppLogger class.
+ * 
+ * @property {string} name - The name of the application, included in the logs and emails.
+ * @property {number} dailyErrorCacheTimeMs - The time in milliseconds to cache errors for before sending an email. Cleared daily. Eg: 1000 * 60 * 60 will send one email per hour if the same error is repeated, specifying how many times it occurred in the hour. 
+ */
 export interface AppLoggerOptions {
     name: string;
     dailyErrorCacheTimeMs?: number;
@@ -18,6 +24,11 @@ export class AppLogger {
     private dailyErrorCache = new Map<string, ErrorCacheEntry>();
     private dailyErrorCacheTimeMs: number;
 
+    /**
+     * Constructor for the AppLogger class.
+     * 
+     * @param {AppLoggerOptions} options - The {@link AppLoggerOptions} to set up the logger.
+     */
     constructor(options: AppLoggerOptions) {
         this.name = options.name;
 
