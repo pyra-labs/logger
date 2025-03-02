@@ -19,7 +19,7 @@ export interface AppLoggerOptions {
 export class AppLogger {
     private name: string;
 
-    protected logger: Logger;
+    public logger: Logger;
 
     private dailyErrorCache = new Map<string, ErrorCacheEntry>();
     private dailyErrorCacheTimeMs: number;
@@ -133,7 +133,7 @@ export class AppLogger {
         });
     }
 
-    protected async sendEmail(subject: string, message: string): Promise<void> {
+    public async sendEmail(subject: string, message: string): Promise<void> {
         try {
             const mailTransporter = nodemailer.createTransport({
                 host: config.EMAIL_HOST,
