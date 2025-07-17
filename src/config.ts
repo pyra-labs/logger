@@ -4,10 +4,12 @@ import { z } from 'zod';
 dotenv.config();
 
 const envSchema = z.object({
-    EMAIL_TO: z.string()
+    EMAIL_TO: z.string().optional().default("")
         .transform((str) => {
             try {
                 const emails = str.split(',').map(email => email.trim());
+                if (emails.length === 0) return [];
+                
                 if (!emails.every(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) throw new Error();
                 return emails;
             } catch {
