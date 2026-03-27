@@ -25,7 +25,7 @@
   "scripts": {
     "lint": "yarn biome lint --write",
     "build": "yarn install && yarn lint && tsc -p tsconfig.json",
-    "deploy": "yarn build && yarn publish --access public"
+    "deploy": "yarn build && npm login && yarn publish"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.3",
